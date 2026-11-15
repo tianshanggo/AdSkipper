@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">开屏跳过</string>
+    <string name="accessibility_service_label">开屏跳过 · 跳过启动广告</string>
+    <string name="accessibility_service_description">在本机自动点击应用开屏广告的「跳过」按钮。仅在新窗口出现后的数秒内扫描界面文字，命中并点击后立即停止；不联网、不读取或上传任何个人数据，规则与统计只保存在本机。你可以随时在系统「设置 - 无障碍」中关闭本服务。</string>
+</resources>
