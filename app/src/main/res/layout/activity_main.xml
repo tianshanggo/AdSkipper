@@ -110,6 +110,22 @@
                 android:textSize="14sp" />
 
             <Switch
+                android:id="@+id/switchAggressive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="兼容模式（提升漏跳 App 的命中率）"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="若某些 App 总是跳不过，打开它：延长扫描时间、放宽按钮识别。可能略增误触，建议只对需要的 App 临时开启。"
+                android:textColor="@color/text_sub"
+                android:textSize="12sp" />
+
+            <Switch
                 android:id="@+id/switchGesture"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -455,6 +471,61 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- 诊断日志 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="诊断日志"
+                android:textColor="@color/text_main"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="记录最近 30 条扫描结果。某个 App 没跳过时，可回到这里看它是否检测到窗口、是否找到按钮。只存本机。"
+                android:textColor="@color/text_sub"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvDiag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_input"
+                android:lineSpacingExtra="3dp"
+                android:maxLines="12"
+                android:padding="12dp"
+                android:scrollbars="vertical"
+                android:text="暂无日志，打开带开屏广告的 App 后会自动记录。"
+                android:textColor="@color/text_main"
+                android:textIsSelectable="true"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btnClearDiag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_button_secondary"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="10dp"
+                android:text="清空日志"
+                android:textAllCaps="false"
+                android:textColor="@color/primary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
         <!-- 使用提示 -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -477,7 +548,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="1. 开启后打开任意带开屏广告的 App 即可验证，统计数字会增加。\n2. Android 13 及以上若提示「受限设置」而无法开启，请先进入应用详情页右上角菜单，选择「允许受限设置」。\n3. 若某个 App 不生效，通常是它的跳过按钮没有文字也没有 id，可尝试开启坐标点击兜底，或自行补充该 App 的规则。\n4. 若出现误触，把该 App 加入白名单，或关闭坐标兜底、精简关键词。\n5. 不需要 Root，也不修改任何其他应用；关闭无障碍开关即完全停用。"
+                android:text="1. 开启后打开任意带开屏广告的 App 即可验证，统计数字会增加。\n2. 若某个 App 有时跳不过：先打开「兼容模式」，并查看上方「诊断日志」——看它是否检测到窗口、是否找到按钮：\n   · 没有「检测到窗口」→ 该 App 可能冻结了服务，请把本应用加入电池优化与自启动白名单；\n   · 有窗口但「未找到按钮」→ 在关键词里补充该按钮的文字，或开启兼容模式；\n   · 有「点击失败」→ 开启坐标点击兜底。\n3. Android 13 及以上若提示「受限设置」而无法开启，请进入应用详情页右上角菜单，选择「允许受限设置」。\n4. 若出现误触，把该 App 加入白名单，或关闭兼容模式与坐标兜底、精简关键词。\n5. 不需要 Root，也不修改任何其他应用；关闭无障碍开关即完全停用。"
                 android:textColor="@color/text_sub"
                 android:textSize="12sp" />
         </LinearLayout>

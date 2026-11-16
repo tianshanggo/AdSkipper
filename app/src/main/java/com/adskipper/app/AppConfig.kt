@@ -17,6 +17,7 @@ object AppConfig {
     private const val KEY_ENABLED = "enabled"
     private const val KEY_GESTURE_FALLBACK = "gesture_fallback"
     private const val KEY_SHOW_TOAST = "show_toast"
+    private const val KEY_AGGRESSIVE = "aggressive"
     private const val KEY_KEYWORDS = "keywords"
     private const val KEY_WHITELIST = "whitelist"
     private const val KEY_STAT_TOTAL = "stat_total"
@@ -24,6 +25,10 @@ object AppConfig {
     private const val KEY_STAT_DATE = "stat_date"
     private const val KEY_LAST_PKG = "last_pkg"
     private const val KEY_LAST_TIME = "last_time"
+    private const val KEY_DIAG = "diag_log"
+
+    /** 诊断日志最多保留条数，避免无限增长 */
+    private const val MAX_DIAG_LINES = 30
 
     /** 默认关键词：覆盖中文「跳过 / 跳过广告 5s」与英文 skip 的常见写法 */
     val DEFAULT_KEYWORDS: List<String> = listOf(
@@ -34,9 +39,14 @@ object AppConfig {
         "跳過",
         "关闭广告",
         "关闭该广告",
+        "跳过该广告",
+        "立即跳过",
         "Skip Ad",
+        "Skip Ads",
+        "Skip Intro",
         "skip",
-        "Close Ad"
+        "Close Ad",
+        "close ad"
     )
 
     /** 内置排除：自身、系统界面、系统设置等，避免在这些界面产生误触 */
@@ -62,6 +72,31 @@ object AppConfig {
     fun isShowToastEnabled(c: Context): Boolean = prefs(c).getBoolean(KEY_SHOW_TOAST, false)
     fun setShowToastEnabled(c: Context, v: Boolean) =
         prefs(c).edit().putBoolean(KEY_SHOW_TOAST, v).apply()
+
+    /** 兼容模式：放宽可见性、延长观察期、加深父控件查找，用于对付漏跳 */
+    fun isAggressiveEnabled(c: Context): Boolean = prefs(c).getBoolean(KEY_AGGRESSIVE, false)
+    fun setAggressiveEnabled(c: Context, v: Boolean) =
+        prefs(c).edit().putBoolean(KEY_AGGRESSIVE, v).apply()
+
+    /**
+     * 追加一条诊断日志（带时间戳），只保留最近若干条。
+     * 每条一行，格式：HH:mm:ss 内容
+     */
+    fun appendDiag(c: Context, line: String) {
+        val time = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+        val entry = "$time  $line"
+        val current = diagText(c)
+        val lines = if (current.isEmpty()) {
+            listOf(entry)
+        } else {
+            (current.lines() + entry).takeLast(MAX_DIAG_LINES)
+        }
+        prefs(c).edit().putString(KEY_DIAG, lines.joinToString("\n")).apply()
+    }
+
+    fun diagText(c: Context): String = prefs(c).getString(KEY_DIAG, "") ?: ""
+
+    fun clearDiag(c: Context) = prefs(c).edit().remove(KEY_DIAG).apply()
 
     fun keywords(c: Context): List<String> {
         val raw = prefs(c).getString(KEY_KEYWORDS, null) ?: return DEFAULT_KEYWORDS

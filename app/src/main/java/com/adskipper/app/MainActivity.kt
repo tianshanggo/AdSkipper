@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.text.method.ScrollingMovementMethod
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -24,6 +25,7 @@ class MainActivity : Activity() {
     private lateinit var tvStatusDesc: TextView
     private lateinit var btnOpenSettings: Button
     private lateinit var switchEnabled: Switch
+    private lateinit var switchAggressive: Switch
     private lateinit var switchGesture: Switch
     private lateinit var switchToast: Switch
     private lateinit var etKeywords: EditText
@@ -32,6 +34,7 @@ class MainActivity : Activity() {
     private lateinit var tvTotal: TextView
     private lateinit var tvToday: TextView
     private lateinit var tvLastSkip: TextView
+    private lateinit var tvDiag: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +49,7 @@ class MainActivity : Activity() {
         super.onResume()
         refreshStatus()
         refreshStats()
+        refreshDiag()
     }
 
     private fun bindViews() {
@@ -54,6 +58,7 @@ class MainActivity : Activity() {
         tvStatusDesc = findViewById(R.id.tvStatusDesc)
         btnOpenSettings = findViewById(R.id.btnOpenSettings)
         switchEnabled = findViewById(R.id.switchEnabled)
+        switchAggressive = findViewById(R.id.switchAggressive)
         switchGesture = findViewById(R.id.switchGesture)
         switchToast = findViewById(R.id.switchToast)
         etKeywords = findViewById(R.id.etKeywords)
@@ -62,11 +67,14 @@ class MainActivity : Activity() {
         tvTotal = findViewById(R.id.tvTotal)
         tvToday = findViewById(R.id.tvToday)
         tvLastSkip = findViewById(R.id.tvLastSkip)
+        tvDiag = findViewById(R.id.tvDiag)
+        tvDiag.movementMethod = ScrollingMovementMethod()
     }
 
     /** 先赋值再注册监听，避免初始化时把默认值重复写回 */
     private fun loadConfig() {
         switchEnabled.isChecked = AppConfig.isEnabled(this)
+        switchAggressive.isChecked = AppConfig.isAggressiveEnabled(this)
         switchGesture.isChecked = AppConfig.isGestureFallbackEnabled(this)
         switchToast.isChecked = AppConfig.isShowToastEnabled(this)
         etKeywords.setText(AppConfig.keywordsText(this))
@@ -76,6 +84,9 @@ class MainActivity : Activity() {
         switchEnabled.setOnCheckedChangeListener { _, checked ->
             AppConfig.setEnabled(this, checked)
             refreshStatus()
+        }
+        switchAggressive.setOnCheckedChangeListener { _, checked ->
+            AppConfig.setAggressiveEnabled(this, checked)
         }
         switchGesture.setOnCheckedChangeListener { _, checked ->
             AppConfig.setGestureFallbackEnabled(this, checked)
@@ -131,6 +142,12 @@ class MainActivity : Activity() {
                 )
             )
         }
+
+        findViewById<Button>(R.id.btnClearDiag).setOnClickListener {
+            AppConfig.clearDiag(this)
+            refreshDiag()
+            toast("日志已清空")
+        }
     }
 
     private fun refreshStatus() {
@@ -163,6 +180,11 @@ class MainActivity : Activity() {
         tvTotal.text = AppConfig.totalCount(this).toString()
         tvToday.text = AppConfig.todayCount(this).toString()
         tvLastSkip.text = AppConfig.lastSkipInfo(this)
+    }
+
+    private fun refreshDiag() {
+        val text = AppConfig.diagText(this)
+        tvDiag.text = if (text.isEmpty()) "暂无日志，打开带开屏广告的 App 后会自动记录。" else text
     }
 
     private fun renderWhitelist() {
