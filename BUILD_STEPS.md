@@ -126,6 +126,8 @@ git ls-files | Select-String '\.github'
 
 ## 7. 已经推过一次：应用这次修复
 
+> **回滚警示（2026-11-16）**：后来那次提交 `4e73c55 更新识别规则与授权引导` 把 `build.yml` 覆盖回了旧版（又含 `android-actions/setup-android@v3`），导致构建 11 秒失败。已再次修复，并把 `checkout` / `setup-java` 升到 v5 以消除 deprecated 警告。**以后提交前确认 `build.yml` 里没有 `setup-android` 字样**，不要从旧备份整段覆盖回来。
+
 `build.yml` 已在本机修好。改动是：**删掉 `android-actions/setup-android@v3`，改用 runner 预装的 SDK 与 `sdkmanager`**（并显式设置 `ANDROID_HOME`）。ubuntu-latest 镜像本来就带 Android SDK，`tools` 包的下架只影响那个多余的 action。
 
 注意 **Actions 里的 Re-run job 会沿用那次提交里的旧 workflow 文件，读不到修复**，所以必须重新提交并推送：

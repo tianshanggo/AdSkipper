@@ -11,24 +11,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - name: 检出代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 安装 JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: 安装 Android SDK
-        uses: android-actions/setup-android@v3
-
+      # ubuntu-latest runner 已预装 Android SDK（/usr/local/lib/android/sdk）与 sdkmanager。
+      # 不要再引入 android-actions/setup-android@v3：该 action 内部会执行 `sdkmanager tools`，
+      # 而旧版 tools 包已从 Google 仓库下架，在新 runner 上必然以 exit code 1 失败。
       - name: 安装 SDK 组件
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+        run: |
+          SDKMGR="$(command -v sdkmanager || true)"
+          if [ -z "$SDKMGR" ]; then
+            SDKMGR="$(find /usr/local/lib/android/sdk/cmdline-tools -name sdkmanager -type f | head -n 1)"
+          fi
+          if [ -z "$SDKMGR" ]; then
+            echo "找不到 sdkmanager"; exit 1
+          fi
+          echo "sdkmanager: $SDKMGR"
+          yes | "$SDKMGR" --licenses > /dev/null || true
+          "$SDKMGR" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
 
       # 仓库里只提供 gradle-wrapper.properties（不含二进制 jar），
-      # 因此云端直接用指定版本的 gradle 命令构建，不依赖 wrapper。
+      # 因此直接用指定版本的 gradle 命令构建，不依赖 wrapper。
       - name: 准备 Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
